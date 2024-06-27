@@ -7,12 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
-
     //전화번호로 조회
-     List<Reservation> findByMember_MemberPhone(String memberPhone);
-
-     //예약
-
-
-    //퇴실
+     Optional<Reservation> findByMember_MemberPhone(String memberPhone);
 }

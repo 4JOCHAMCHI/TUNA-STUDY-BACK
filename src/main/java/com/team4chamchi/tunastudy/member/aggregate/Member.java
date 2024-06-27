@@ -27,4 +27,8 @@ public class Member {
     @JsonIgnore
     @ToString.Exclude
     private List<Reservation> reservations;
+
+    public Member(String memberPhone) {
+        this.memberPhone = memberPhone;
+    }
 }
