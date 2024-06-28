@@ -18,8 +18,8 @@ public class Reservation {
     @Column(name = "reservation_id")
     private int reservationId;
 
-    @Column(name = "usage")
-    private Boolean usage;
+    @Column(name = "occupied")
+    private Boolean occupied;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -28,4 +28,10 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private StudyRoom room;
+
+    public Reservation(Member member, StudyRoom room) {
+        this.occupied = true;
+        this.member = member;
+        this.room = room;
+    }
 }

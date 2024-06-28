@@ -23,7 +23,7 @@ public class StudyRoom {
     @Column(name = "room_name")
     private String roomName;
 
-    @OneToMany(mappedBy = "studyRoom", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
     private List<Reservation> reservations;

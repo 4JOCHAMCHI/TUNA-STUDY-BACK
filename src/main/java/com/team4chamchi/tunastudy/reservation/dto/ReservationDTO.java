@@ -14,7 +14,7 @@ import lombok.Setter;
 public class ReservationDTO {
 
     private int reservationId;
-    private Boolean usage;
+    private Boolean occupied;
     private int memberId;
     private String memberPhone;
     private int roomId;
@@ -22,7 +22,7 @@ public class ReservationDTO {
 
     public ReservationDTO(Reservation reservation) {
         this.reservationId = reservation.getReservationId();
-        this.usage = reservation.getUsage();
+        this.occupied = reservation.getOccupied();
         this.memberId = reservation.getMember().getMemberId();
         this.memberPhone = reservation.getMember().getMemberPhone();
         this.roomId = reservation.getRoom().getRoomId();

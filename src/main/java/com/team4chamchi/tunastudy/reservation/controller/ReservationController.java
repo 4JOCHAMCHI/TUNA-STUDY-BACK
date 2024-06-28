@@ -20,8 +20,10 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping("/{phone}")
-    public ResponseEntity<ReservationDTO> findUser(@PathVariable("phone") String phone) {
-        
+    @GetMapping("/{phone}/{roomId}")
+    public ResponseEntity<ReservationDTO> addReservation(@PathVariable("phone") String phone, @PathVariable("roomId") int roomId) {
+        ReservationDTO reservation = reservationService.AddReservationByPhoneAndSeat(phone, roomId);
+
+        return ResponseEntity.ok(reservation);
     }
 }
