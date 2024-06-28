@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -25,6 +27,10 @@ public class ReservationService {
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.studyRoomRepository = studyRoomRepository;
+    }
+
+    public List<ReservationDTO> findAllAvailableSeat() {
+        return reservationRepository.findByOccupiedFalse().stream().map(ReservationDTO::new).collect(Collectors.toList());
     }
 
     public Member findMemberByPhone(String memberPhone) {
