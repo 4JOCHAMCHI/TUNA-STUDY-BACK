@@ -1,5 +1,7 @@
 package com.team4chamchi.tunastudy.reservation.controller;
 
+import com.team4chamchi.tunastudy.member.aggregate.Member;
+import com.team4chamchi.tunastudy.member.dto.MemberDTO;
 import com.team4chamchi.tunastudy.reservation.dto.ReservationDTO;
 import com.team4chamchi.tunastudy.reservation.service.ReservationService;
 import com.team4chamchi.tunastudy.studyroom.dto.StudyRoomDTO;
@@ -24,24 +26,45 @@ public class ReservationController {
         this.studyRoomService = studyRoomService;
     }
 
-    @GetMapping("/reservation/{phone}/{roomId}")
-    public ResponseEntity<ReservationDTO> addReservation(@PathVariable("phone") String phone, @PathVariable("roomId") int roomId) {
-        ReservationDTO reservation = reservationService.AddReservationByPhoneAndSeat(phone, roomId);
-
-        return ResponseEntity.ok(reservation);
-    }
-
-    @GetMapping("/seat")
-    public ResponseEntity<List<ReservationDTO>> findAllAvailableSeat() {
-        List<ReservationDTO> reservationList = reservationService.findAllAvailableSeat();
-
-        return ResponseEntity.ok(reservationList);
-    }
-
     @GetMapping("/all")
     public ResponseEntity<List<StudyRoomDTO>> findAllSeat() {
         List<StudyRoomDTO> allSeatList = studyRoomService.findALlSeat();
 
         return ResponseEntity.ok(allSeatList);
+    }
+
+    @GetMapping("/seat")
+    public ResponseEntity<List<ReservationDTO>> findAllOccupiedSeat() {
+        List<ReservationDTO> reservationList = reservationService.findAllOccupiedSeat();
+
+        return ResponseEntity.ok(reservationList);
+    }
+
+    @GetMapping("/member/{phone}")
+    public ResponseEntity<MemberDTO> findMemberByPhone(@PathVariable("phone") String phone) {
+        MemberDTO member =  new MemberDTO(reservationService.findMemberByPhone(phone));
+
+        return ResponseEntity.ok(member);
+    }
+
+    @GetMapping("/reservation/{phone}/{roomId}")
+    public ResponseEntity<ReservationDTO> findReservation(@PathVariable("phone") String phone, @PathVariable("roomId") int roomId) {
+        ReservationDTO reservation = reservationService.findReservationByPhoneAndSeat(phone, roomId);
+
+        return ResponseEntity.ok(reservation);
+    }
+
+    @GetMapping("/check-in/{reservationId}")
+    public ResponseEntity<ReservationDTO> checkInReservation(@PathVariable("reservationId") int reservationId) {
+        ReservationDTO reservation = reservationService.createReservation(reservationId);
+
+        return ResponseEntity.ok(reservation);
+    }
+
+    @GetMapping("/check-out/{reservationId}")
+    public ResponseEntity<ReservationDTO> checkOutReservation(@PathVariable("reservationId") int reservationId) {
+        ReservationDTO reservation = reservationService.releaseReservation(reservationId);
+
+        return ResponseEntity.ok(reservation);
     }
 }

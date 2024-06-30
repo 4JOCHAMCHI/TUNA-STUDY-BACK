@@ -1,6 +1,7 @@
 package com.team4chamchi.tunastudy.reservation.aggregate;
 
 import com.team4chamchi.tunastudy.member.aggregate.Member;
+import com.team4chamchi.tunastudy.reservation.dto.ReservationDTO;
 import com.team4chamchi.tunastudy.studyroom.aggregate.StudyRoom;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,7 +31,7 @@ public class Reservation {
     private StudyRoom room;
 
     public Reservation(Member member, StudyRoom room) {
-        this.occupied = true;
+        this.occupied = false;
         this.member = member;
         this.room = room;
     }

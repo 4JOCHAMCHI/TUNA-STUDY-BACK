@@ -23,7 +23,6 @@ public class NotificationService {
                     .phoneNumber(phone)
                     .build();
 
-            System.out.println(request);
             snsClient.publish(request);
             System.out.println(phone + "문자 발송");
 

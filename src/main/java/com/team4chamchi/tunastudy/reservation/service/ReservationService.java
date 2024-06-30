@@ -32,8 +32,8 @@ public class ReservationService {
         this.notificationService = notificationService;
     }
 
-    public List<ReservationDTO> findAllAvailableSeat() {
-        return reservationRepository.findByOccupiedFalse().stream().map(ReservationDTO::new).collect(Collectors.toList());
+    public List<ReservationDTO> findAllOccupiedSeat() {
+        return reservationRepository.findByOccupiedTrue().stream().map(ReservationDTO::new).collect(Collectors.toList());
     }
 
     public Member findMemberByPhone(String memberPhone) {
@@ -48,12 +48,9 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationDTO AddReservationByPhoneAndSeat(String memberPhone, int roomId) {
+    public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
         Member member = findMemberByPhone(memberPhone);
         StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
-
-        String phone = "+82" + member.getMemberPhone();
-        String roomName = room.getRoomName();
 
         //전화번호랑 좌석으로 예약 조회
         Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
@@ -61,24 +58,52 @@ public class ReservationService {
         //조회된 예약이 없는 경우 -> 예약
         if (reservation.isEmpty()) {
             Reservation newReservation = new Reservation(member, room);
-            reservationRepository.save(newReservation);
-
-            notificationService.sendMessage(phone, roomName + "번 좌석 예약되었습니다!");
 
             return new ReservationDTO(reservationRepository.save(newReservation));
         }
 
-        //조회된 예약이 있는데 상태가 False -> 예약
-        if (!reservation.get().getOccupied()) {
-            reservation.get().setOccupied(true);
+        return new ReservationDTO(reservation.get());
+    }
+
+    //예약
+    @Transactional
+    public ReservationDTO createReservation(int reservationId) {
+        Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+
+        if (reservation.isPresent()) {
+            Reservation foundReservation = reservation.get();
+
+            foundReservation.setOccupied(true);
+
+            String phone = "+82" + foundReservation.getMember().getMemberPhone();
+            String roomName = foundReservation.getRoom().getRoomName();
+
             notificationService.sendMessage(phone, roomName + "번 좌석 예약되었습니다!");
 
+            return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
-            //조회된 예약이 있는데 상태가 True -> 퇴실
-            reservation.get().setOccupied(false);
-            notificationService.sendMessage(phone, roomName + "번 좌석 퇴실되었습니다!");
+            throw new IllegalArgumentException("Reservation with id " + reservationId+ " not found.");
         }
+    }
 
-        return new ReservationDTO(reservationRepository.save(reservation.get()));
+    //퇴실
+    @Transactional
+    public ReservationDTO releaseReservation(int reservationId) {
+        Optional<Reservation> reservation = reservationRepository.findById(reservationId);
+
+        if (reservation.isPresent()) {
+            Reservation foundReservation = reservation.get();
+
+            foundReservation.setOccupied(false);
+
+            String phone = "+82" + foundReservation.getMember().getMemberPhone();
+            String roomName = foundReservation.getRoom().getRoomName();
+
+            notificationService.sendMessage(phone, roomName + "번 좌석 퇴실되었습니다!");
+
+            return new ReservationDTO(reservationRepository.save(foundReservation));
+        } else {
+            throw new IllegalArgumentException("Reservation with id " + reservationId + " not found.");
+        }
     }
 }
