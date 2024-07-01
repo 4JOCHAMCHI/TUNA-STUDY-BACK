@@ -41,10 +41,10 @@ public class ReservationController {
     }
 
     @GetMapping("/member/{phone}")
-    public ResponseEntity<MemberDTO> findMemberByPhone(@PathVariable("phone") String phone) {
-        MemberDTO member =  new MemberDTO(reservationService.findMemberByPhone(phone));
+    public ResponseEntity<ReservationDTO> findReservationByPhone(@PathVariable("phone") String phone) {
+        ReservationDTO reservation =  new ReservationDTO(reservationService.findReservationByPhone(phone));
 
-        return ResponseEntity.ok(member);
+        return ResponseEntity.ok(reservation);
     }
 
     @GetMapping("/reservation/{phone}/{roomId}")
