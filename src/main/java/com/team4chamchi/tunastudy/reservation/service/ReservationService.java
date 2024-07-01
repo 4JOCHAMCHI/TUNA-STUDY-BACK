@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,6 +81,8 @@ public class ReservationService {
             Reservation foundReservation = reservation.get();
 
             foundReservation.setOccupied(true);
+            foundReservation.setStartDate(LocalDateTime.now().withSecond(0).withNano(0));
+            foundReservation.setEndDate(foundReservation.getStartDate().plusHours(2).withSecond(0).withNano(0));
 
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String roomName = foundReservation.getRoom().getRoomName();
@@ -102,6 +104,7 @@ public class ReservationService {
             Reservation foundReservation = reservation.get();
 
             foundReservation.setOccupied(false);
+            foundReservation.setEndDate(LocalDateTime.now().withSecond(0).withNano(0));
 
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String roomName = foundReservation.getRoom().getRoomName();
@@ -111,6 +114,16 @@ public class ReservationService {
             return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
             throw new IllegalArgumentException("Reservation with id " + reservationId + " not found.");
+        }
+    }
+
+    public void tenMinutesNotification() {
+        LocalDateTime tenMinutesAgo = LocalDateTime.now().plusMinutes(10).withSecond(0).withNano(0);
+        List<Reservation> reservationList = reservationRepository.findByOccupiedTrueAndEndDate(tenMinutesAgo);
+
+        for (Reservation reservation : reservationList) {
+            notificationService.sendMessage(reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
+//            System.out.println(reservation.getMember().getMemberPhone() + " " + reservation.getRoom().getRoomName());
         }
     }
 }

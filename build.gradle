@@ -36,6 +36,10 @@ dependencies {
 
     implementation 'software.amazon.awssdk:sns:2.20.12' // AWS SDK for SNS
     implementation 'software.amazon.awssdk:core:2.20.12' // AWS SDK Core
+
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+    testImplementation 'org.springframework.batch:spring-batch-test'
 }
 
 tasks.named('test') {

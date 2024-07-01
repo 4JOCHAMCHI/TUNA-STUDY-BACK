@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,6 +21,8 @@ public class ReservationDTO {
     private String memberPhone;
     private int roomId;
     private String roomName;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     public ReservationDTO(Reservation reservation) {
         this.reservationId = reservation.getReservationId();
@@ -27,5 +31,7 @@ public class ReservationDTO {
         this.memberPhone = reservation.getMember().getMemberPhone();
         this.roomId = reservation.getRoom().getRoomId();
         this.roomName = reservation.getRoom().getRoomName();
+        this.startDate = reservation.getStartDate();
+        this.endDate = reservation.getEndDate();
     }
 }

@@ -6,6 +6,8 @@ import com.team4chamchi.tunastudy.studyroom.aggregate.StudyRoom;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "reservation")
 @NoArgsConstructor
@@ -30,9 +32,17 @@ public class Reservation {
     @JoinColumn(name = "room_id")
     private StudyRoom room;
 
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
+
     public Reservation(Member member, StudyRoom room) {
         this.occupied = false;
         this.member = member;
         this.room = room;
+        this.startDate = LocalDateTime.now();
+        this.endDate = LocalDateTime.now();
     }
 }
