@@ -1,6 +1,7 @@
 package com.team4chamchi.tunastudy.reservation.service;
 
 import com.team4chamchi.tunastudy.member.aggregate.Member;
+import com.team4chamchi.tunastudy.member.dto.MemberDTO;
 import com.team4chamchi.tunastudy.member.repository.MemberRepository;
 import com.team4chamchi.tunastudy.notification.service.NotificationService;
 import com.team4chamchi.tunastudy.reservation.aggregate.Reservation;
@@ -23,8 +24,8 @@ public class ReservationService {
 
     private final StudyRoomRepository studyRoomRepository;
     private final NotificationService notificationService;
-    private MemberRepository memberRepository;
-    private ReservationRepository reservationRepository;
+    private final MemberRepository memberRepository;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
     public ReservationService(MemberRepository memberRepository, ReservationRepository reservationRepository, StudyRoomRepository studyRoomRepository, NotificationService notificationService) {
@@ -38,26 +39,31 @@ public class ReservationService {
         return reservationRepository.findByOccupiedTrue().stream().map(ReservationDTO::new).collect(Collectors.toList());
     }
 
-    public Reservation findReservationByPhone(String memberPhone) {
-        Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndOccupiedTrue(memberPhone);
-
-        return reservation.orElse(null);
+    public Optional<Reservation> findReservationByPhone(String memberPhone) {
+        return reservationRepository.findByMember_MemberPhoneAndOccupiedTrue(memberPhone);
     }
 
-    public Member findMemberByPhone(String memberPhone) {
-        Optional<Member> member = memberRepository.findByMemberPhone(memberPhone);
+    public Optional<Member> findMemberByPhone(String memberPhone) {
+        return memberRepository.findByMemberPhone(memberPhone);
 
-        return member.orElseGet(() -> {
-            //조회해서 멤버가 없으면 생성
-            Member newMember = new Member(memberPhone);
+//        return member.orElseGet(() -> {
+//            //조회해서 멤버가 없으면 생성
+//            Member newMember = new Member(memberPhone);
+//
+//            return memberRepository.save(newMember);
+//        });
+    }
 
-            return memberRepository.save(newMember);
-        });
+    public Member addMember(MemberDTO memberDTO) {
+        Member member = new Member(memberDTO);
+
+        return memberRepository.save(member);
     }
 
     @Transactional
     public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
         Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
         StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
 
         //전화번호랑 좌석으로 예약 조회
@@ -88,7 +94,7 @@ public class ReservationService {
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String roomName = foundReservation.getRoom().getRoomName();
 
-            notificationService.sendMessage(phone, roomName + "번 좌석 예약되었습니다!");
+//            notificationService.sendMessage(phone, roomName + "번 좌석 예약되었습니다!");
 
             return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
@@ -110,7 +116,7 @@ public class ReservationService {
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String roomName = foundReservation.getRoom().getRoomName();
 
-            notificationService.sendMessage(phone, roomName + "번 좌석 퇴실되었습니다!");
+//            notificationService.sendMessage(phone, roomName + "번 좌석 퇴실되었습니다!");
 
             return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
@@ -126,7 +132,7 @@ public class ReservationService {
         System.out.println("실행");
 
         for (Reservation reservation : reservationList) {
-            notificationService.sendMessage(reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
+            notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
 //            System.out.println(reservation.getMember().getMemberPhone() + " " + reservation.getRoom().getRoomName());
         }
     }
