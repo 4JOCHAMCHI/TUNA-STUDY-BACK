@@ -1,9 +1,12 @@
 package com.team4chamchi.tunastudy.reservation.aggregate;
 
 import com.team4chamchi.tunastudy.member.aggregate.Member;
+import com.team4chamchi.tunastudy.reservation.dto.ReservationDTO;
 import com.team4chamchi.tunastudy.studyroom.aggregate.StudyRoom;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservation")
@@ -18,8 +21,8 @@ public class Reservation {
     @Column(name = "reservation_id")
     private int reservationId;
 
-    @Column(name = "usage")
-    private Boolean usage;
+    @Column(name = "occupied")
+    private Boolean occupied;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -28,4 +31,18 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private StudyRoom room;
+
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
+
+    public Reservation(Member member, StudyRoom room) {
+        this.occupied = false;
+        this.member = member;
+        this.room = room;
+        this.startDate = LocalDateTime.now();
+        this.endDate = LocalDateTime.now();
+    }
 }
