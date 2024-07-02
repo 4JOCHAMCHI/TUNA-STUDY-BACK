@@ -10,6 +10,7 @@ import com.team4chamchi.tunastudy.reservation.repository.ReservationRepository;
 import com.team4chamchi.tunastudy.studyroom.aggregate.StudyRoom;
 import com.team4chamchi.tunastudy.studyroom.respository.StudyRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +62,8 @@ public class ReservationService {
 
     @Transactional
     public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
-        Member member = findMemberByPhone(memberPhone).orElseThrow();
+        Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
         StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
 
         //전화번호랑 좌석으로 예약 조회
@@ -122,9 +124,12 @@ public class ReservationService {
         }
     }
 
+    @Scheduled(cron = "0 * * * * *")
     public void tenMinutesNotification() {
         LocalDateTime tenMinutesAgo = LocalDateTime.now().plusMinutes(10).withSecond(0).withNano(0);
         List<Reservation> reservationList = reservationRepository.findByOccupiedTrueAndEndDate(tenMinutesAgo);
+
+        System.out.println("실행");
 
         for (Reservation reservation : reservationList) {
             notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
