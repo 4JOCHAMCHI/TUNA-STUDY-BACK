@@ -38,10 +38,8 @@ public class ReservationService {
         return reservationRepository.findByOccupiedTrue().stream().map(ReservationDTO::new).collect(Collectors.toList());
     }
 
-    public Reservation findReservationByPhone(String memberPhone) {
-        Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndOccupiedTrue(memberPhone);
-
-        return reservation.orElse(null);
+    public Optional<Reservation> findReservationByPhone(String memberPhone) {
+        return reservationRepository.findByMember_MemberPhoneAndOccupiedTrue(memberPhone);
     }
 
     public Member findMemberByPhone(String memberPhone) {
@@ -79,8 +77,8 @@ public class ReservationService {
 
         return new ReservationDTO(reservation.get());
     }
-    //예약
 
+    //예약
     @Transactional
     public ReservationDTO createReservation(int reservationId) {
         Optional<Reservation> reservation = reservationRepository.findById(reservationId);
@@ -102,8 +100,8 @@ public class ReservationService {
             throw new IllegalArgumentException("Reservation with id " + reservationId+ " not found.");
         }
     }
-    //퇴실
 
+    //퇴실
     @Transactional
     public ReservationDTO releaseReservation(int reservationId) {
         Optional<Reservation> reservation = reservationRepository.findById(reservationId);

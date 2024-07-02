@@ -1,17 +1,18 @@
 package com.team4chamchi.tunastudy.reservation.controller;
 
-import com.team4chamchi.tunastudy.member.aggregate.Member;
 import com.team4chamchi.tunastudy.member.dto.MemberDTO;
-import com.team4chamchi.tunastudy.member.repository.MemberRepository;
+import com.team4chamchi.tunastudy.reservation.aggregate.Reservation;
 import com.team4chamchi.tunastudy.reservation.dto.ReservationDTO;
 import com.team4chamchi.tunastudy.reservation.service.ReservationService;
 import com.team4chamchi.tunastudy.studyroom.dto.StudyRoomDTO;
 import com.team4chamchi.tunastudy.studyroom.service.StudyRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ReservationController {
@@ -55,9 +56,9 @@ public class ReservationController {
 
     @GetMapping("/member/{phone}")
     public ResponseEntity<ReservationDTO> findReservationByPhone(@PathVariable("phone") String phone) {
-        ReservationDTO reservation = new ReservationDTO(reservationService.findReservationByPhone(phone));
+        Optional<Reservation> reservation = reservationService.findReservationByPhone(phone);
 
-        return ResponseEntity.ok(reservation);
+        return reservation.map(value -> ResponseEntity.ok(new ReservationDTO(value))).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     @GetMapping("/reservation/{phone}/{roomId}")
