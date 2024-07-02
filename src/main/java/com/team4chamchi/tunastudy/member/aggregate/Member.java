@@ -1,6 +1,7 @@
 package com.team4chamchi.tunastudy.member.aggregate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.team4chamchi.tunastudy.member.dto.MemberDTO;
 import com.team4chamchi.tunastudy.reservation.aggregate.Reservation;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,12 +24,20 @@ public class Member {
     @Column(name = "member_phone")
     private String memberPhone;
 
+    @Column(name = "member_name")
+    private String memberName;
+
+    @Column(name = "email")
+    private String email;
+
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
     private List<Reservation> reservations;
 
-    public Member(String memberPhone) {
-        this.memberPhone = memberPhone;
+    public Member(MemberDTO memberDTO) {
+        this.memberPhone = memberDTO.getMemberPhone();
+        this.memberName = memberDTO.getMemberName();
+        this.email = memberDTO.getEmail();
     }
 }

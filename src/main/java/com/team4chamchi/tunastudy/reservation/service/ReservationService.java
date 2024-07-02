@@ -1,6 +1,7 @@
 package com.team4chamchi.tunastudy.reservation.service;
 
 import com.team4chamchi.tunastudy.member.aggregate.Member;
+import com.team4chamchi.tunastudy.member.dto.MemberDTO;
 import com.team4chamchi.tunastudy.member.repository.MemberRepository;
 import com.team4chamchi.tunastudy.notification.service.NotificationService;
 import com.team4chamchi.tunastudy.reservation.aggregate.Reservation;
@@ -22,8 +23,8 @@ public class ReservationService {
 
     private final StudyRoomRepository studyRoomRepository;
     private final NotificationService notificationService;
-    private MemberRepository memberRepository;
-    private ReservationRepository reservationRepository;
+    private final MemberRepository memberRepository;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
     public ReservationService(MemberRepository memberRepository, ReservationRepository reservationRepository, StudyRoomRepository studyRoomRepository, NotificationService notificationService) {
@@ -46,12 +47,19 @@ public class ReservationService {
     public Member findMemberByPhone(String memberPhone) {
         Optional<Member> member = memberRepository.findByMemberPhone(memberPhone);
 
-        return member.orElseGet(() -> {
-            //조회해서 멤버가 없으면 생성
-            Member newMember = new Member(memberPhone);
+//        return member.orElseGet(() -> {
+//            //조회해서 멤버가 없으면 생성
+//            Member newMember = new Member(memberPhone);
+//
+//            return memberRepository.save(newMember);
+//        });
+        return member.orElse(null);
+    }
 
-            return memberRepository.save(newMember);
-        });
+    public Member addMember(MemberDTO memberDTO) {
+        Member member = new Member(memberDTO);
+
+        return memberRepository.save(member);
     }
 
     @Transactional
@@ -71,8 +79,8 @@ public class ReservationService {
 
         return new ReservationDTO(reservation.get());
     }
-
     //예약
+
     @Transactional
     public ReservationDTO createReservation(int reservationId) {
         Optional<Reservation> reservation = reservationRepository.findById(reservationId);
@@ -87,15 +95,15 @@ public class ReservationService {
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String roomName = foundReservation.getRoom().getRoomName();
 
-            notificationService.sendMessage(phone, roomName + "번 좌석 예약되었습니다!");
+//            notificationService.sendMessage(phone, roomName + "번 좌석 예약되었습니다!");
 
             return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
             throw new IllegalArgumentException("Reservation with id " + reservationId+ " not found.");
         }
     }
-
     //퇴실
+
     @Transactional
     public ReservationDTO releaseReservation(int reservationId) {
         Optional<Reservation> reservation = reservationRepository.findById(reservationId);
@@ -109,7 +117,7 @@ public class ReservationService {
             String phone = "+82" + foundReservation.getMember().getMemberPhone();
             String roomName = foundReservation.getRoom().getRoomName();
 
-            notificationService.sendMessage(phone, roomName + "번 좌석 퇴실되었습니다!");
+//            notificationService.sendMessage(phone, roomName + "번 좌석 퇴실되었습니다!");
 
             return new ReservationDTO(reservationRepository.save(foundReservation));
         } else {
@@ -122,7 +130,7 @@ public class ReservationService {
         List<Reservation> reservationList = reservationRepository.findByOccupiedTrueAndEndDate(tenMinutesAgo);
 
         for (Reservation reservation : reservationList) {
-            notificationService.sendMessage(reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
+            notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
 //            System.out.println(reservation.getMember().getMemberPhone() + " " + reservation.getRoom().getRoomName());
         }
     }

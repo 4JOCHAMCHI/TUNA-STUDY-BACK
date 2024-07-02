@@ -11,9 +11,13 @@ import lombok.*;
 public class MemberDTO {
     private int memberId;
     private String memberPhone;
+    private String memberName;
+    private String email;
 
     public MemberDTO(Member member) {
         this.memberId = member.getMemberId();
         this.memberPhone =  member.getMemberPhone();
+        this.memberName = member.getMemberName();
+        this.email = member.getEmail();
     }
 }
