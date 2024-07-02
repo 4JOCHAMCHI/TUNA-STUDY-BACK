@@ -42,8 +42,8 @@ public class ReservationService {
         return reservationRepository.findByMember_MemberPhoneAndOccupiedTrue(memberPhone);
     }
 
-    public Member findMemberByPhone(String memberPhone) {
-        Optional<Member> member = memberRepository.findByMemberPhone(memberPhone);
+    public Optional<Member> findMemberByPhone(String memberPhone) {
+        return memberRepository.findByMemberPhone(memberPhone);
 
 //        return member.orElseGet(() -> {
 //            //조회해서 멤버가 없으면 생성
@@ -51,7 +51,6 @@ public class ReservationService {
 //
 //            return memberRepository.save(newMember);
 //        });
-        return member.orElse(null);
     }
 
     public Member addMember(MemberDTO memberDTO) {
@@ -62,7 +61,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
-        Member member = findMemberByPhone(memberPhone);
+        Member member = findMemberByPhone(memberPhone).orElseThrow();
         StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
 
         //전화번호랑 좌석으로 예약 조회

@@ -1,5 +1,6 @@
 package com.team4chamchi.tunastudy.reservation.controller;
 
+import com.team4chamchi.tunastudy.member.aggregate.Member;
 import com.team4chamchi.tunastudy.member.dto.MemberDTO;
 import com.team4chamchi.tunastudy.reservation.aggregate.Reservation;
 import com.team4chamchi.tunastudy.reservation.dto.ReservationDTO;
@@ -42,9 +43,9 @@ public class ReservationController {
 
     @GetMapping("/member-check/{phone}")
     public ResponseEntity<MemberDTO> findMemberByPhone(@PathVariable("phone") String phone) {
-        MemberDTO member = new MemberDTO(reservationService.findMemberByPhone(phone));
+        Optional<Member> member = reservationService.findMemberByPhone(phone);
 
-        return ResponseEntity.ok(member);
+        return member.map(value -> ResponseEntity.ok(new MemberDTO(value))).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     @PostMapping("/member")
