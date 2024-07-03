@@ -18,11 +18,13 @@ public class NotificationService {
 
     public void sendMessage(String phone, String content) {
         try {
+            // SMS 구성
             PublishRequest request = PublishRequest.builder()
                     .message(content)
                     .phoneNumber(phone)
                     .build();
 
+            // SMS 발송
             snsClient.publish(request);
             System.out.println(phone + "문자 발송");
 

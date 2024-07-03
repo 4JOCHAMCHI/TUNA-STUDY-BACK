@@ -132,8 +132,19 @@ public class ReservationService {
         System.out.println("실행");
 
         for (Reservation reservation : reservationList) {
-            notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
-//            System.out.println(reservation.getMember().getMemberPhone() + " " + reservation.getRoom().getRoomName());
+//            notificationService.sendMessage("+82" + reservation.getMember().getMemberPhone(), reservation.getRoom().getRoomName()+ "번 좌석 퇴실 10분 전입니다.");
+            System.out.println(reservation.getMember().getMemberPhone() + " " + reservation.getRoom().getRoomName());
+        }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 * * * * *")
+    public void autoReleaseReservation() {
+        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+        List<Reservation> reservationList = reservationRepository.findByOccupiedTrueAndEndDate(now);
+
+        for (Reservation reservation : reservationList) {
+            reservation.setOccupied(false);
         }
     }
 }
