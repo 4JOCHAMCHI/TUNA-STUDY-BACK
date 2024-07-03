@@ -10,9 +10,11 @@ import com.team4chamchi.tunastudy.reservation.repository.ReservationRepository;
 import com.team4chamchi.tunastudy.studyroom.aggregate.StudyRoom;
 import com.team4chamchi.tunastudy.studyroom.respository.StudyRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +36,21 @@ public class ReservationService {
         this.studyRoomRepository = studyRoomRepository;
         this.notificationService = notificationService;
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public class MemberNotFoundException extends RuntimeException {
+        public MemberNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public class InvalidRoomException extends RuntimeException {
+        public InvalidRoomException(String message) {
+            super(message);
+        }
+    }
+
 
     public List<ReservationDTO> findAllOccupiedSeat() {
         return reservationRepository.findByOccupiedTrue().stream().map(ReservationDTO::new).collect(Collectors.toList());
@@ -62,9 +79,9 @@ public class ReservationService {
 
     @Transactional
     public ReservationDTO findReservationByPhoneAndSeat(String memberPhone, int roomId) {
-        Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+        Member member = findMemberByPhone(memberPhone).orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-        StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("유효하지 않은 좌석입니다."));
+        StudyRoom room = studyRoomRepository.findById(roomId).orElseThrow(() -> new InvalidRoomException("유효하지 않은 좌석입니다."));
 
         //전화번호랑 좌석으로 예약 조회
         Optional<Reservation> reservation = reservationRepository.findByMember_MemberPhoneAndRoom_RoomId(memberPhone, roomId);
